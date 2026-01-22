@@ -1,13 +1,16 @@
-use futures_util::StreamExt; 
-use tokio_tungstenite::connect_async; 
+use futures_util::StreamExt;
+use tokio_tungstenite::connect_async;
 
 pub async fn stream_trades(symbol: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let url = format!("wss://stream.binance.com:9443/ws/{}@trade", symbol.to_lowercase());
+    let url = format!(
+        "wss://stream.binance.com:9443/ws/{}@trade",
+        symbol.to_lowercase()
+    );
     let (ws_stream, _) = connect_async(&url).await?;
 
     println!("Connected to {} trade stream", symbol);
 
-    let (_, mut read) = ws_stream.split(); 
+    let (_, mut read) = ws_stream.split();
 
     while let Some(message) = read.next().await {
         match message {
@@ -17,7 +20,7 @@ pub async fn stream_trades(symbol: &str) -> Result<(), Box<dyn std::error::Error
                 }
             }
             Err(e) => {
-                eprintln!("WebSocket error: {}", e); 
+                eprintln!("WebSocket error: {}", e);
                 break;
             }
         }
